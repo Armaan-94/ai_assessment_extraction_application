@@ -3,6 +3,8 @@ import { model } from '@/lib/gemini';
 import { PROMPTS } from '@/lib/prompts';
 import { SchemaType } from '@google/generative-ai';
 
+export const maxDuration = 60;
+
 export async function POST(req) {
   try {
     const { images } = await req.json();
@@ -30,12 +32,14 @@ export async function POST(req) {
 
     // Process each page
     for (let i = 0; i < images.length; i++) {
-      const base64Data = images[i].replace(/^data:image\/\w+;base64,/, '');
-      
+      const match = images[i].match(/^data:(image\/\w+);base64,(.+)$/);
+      const mimeType = match ? match[1] : 'image/jpeg';
+      const base64Data = match ? match[2] : images[i].replace(/^data:image\/\w+;base64,/, '');
+
       const imagePart = {
         inlineData: {
           data: base64Data,
-          mimeType: 'image/jpeg',
+          mimeType,
         },
       };
 
@@ -64,6 +68,22 @@ export async function POST(req) {
         allQuestions.push(q);
       });
     }
+
+    // Gemini assigns ids per-page with no visibility into other pages' ids,
+    // so collisions are possible (e.g. two different questions both getting "q1").
+    // De-duplicate here to guarantee ids stay unique across the whole document,
+    // since every downstream match (answers, grading, UI selection) keys off id.
+    const seenIds = new Set();
+    allQuestions.forEach((q, idx) => {
+      const baseId = q.id || `q${idx}`;
+      let uniqueId = baseId;
+      let suffix = 2;
+      while (seenIds.has(uniqueId)) {
+        uniqueId = `${baseId}_${suffix++}`;
+      }
+      seenIds.add(uniqueId);
+      q.id = uniqueId;
+    });
 
     return NextResponse.json({ questions: allQuestions });
   } catch (error) {

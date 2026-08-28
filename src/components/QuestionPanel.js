@@ -17,9 +17,11 @@ export default function QuestionPanel() {
         {questions.map((q) => {
           const isSelected = selectedQuestionId === q.id;
           const grade = grades.find(g => g.questionId === q.id);
-          const isAnswered = grade && grade.evaluation !== 'unanswered';
-          const scoreColor = isAnswered && grade.score === grade.maxScore ? 'text-green-600 bg-green-50' : 
-                             isAnswered ? 'text-orange-600 bg-orange-50' : 'text-gray-500 bg-gray-100';
+          const isUnanswered = grade?.evaluation === 'unanswered';
+          const isAnswered = grade && !isUnanswered;
+          const scoreColor = isAnswered && grade.score === grade.maxScore ? 'text-green-600 bg-green-50' :
+                             isAnswered ? 'text-orange-600 bg-orange-50' :
+                             isUnanswered ? 'text-red-500 bg-red-50' : 'text-gray-500 bg-gray-100';
 
           return (
             <div 
@@ -38,7 +40,7 @@ export default function QuestionPanel() {
                 <div className="flex-1">
                   <p className="text-sm text-gray-800 line-clamp-3">{q.text}</p>
                   
-                  {isSelected && grade && isAnswered && (
+                  {isSelected && grade && (
                     <div className="mt-4 pt-3 border-t border-gray-100">
                       <h4 className="text-xs font-bold text-gray-900 mb-1">AI Feedback</h4>
                       <p className="text-xs text-gray-600">{grade.feedback}</p>
@@ -47,7 +49,7 @@ export default function QuestionPanel() {
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   <span className={`text-xs font-bold px-2 py-1 rounded ${scoreColor}`}>
-                    {grade ? `${grade.score}/${grade.maxScore}` : `${q.marks ? `?/${q.marks}` : '-'}`}
+                    {isUnanswered ? 'Unanswered' : grade ? `${grade.score}/${grade.maxScore}` : `${q.marks ? `?/${q.marks}` : '-'}`}
                   </span>
                   <svg className={`w-4 h-4 text-gray-400 transition-transform ${isSelected ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </div>

@@ -6,6 +6,7 @@ import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import QuestionPanel from '@/components/QuestionPanel';
 import AnswerViewer from '@/components/AnswerViewer';
+import UnmatchedAnswers from '@/components/UnmatchedAnswers';
 import { useAssessment } from '@/context/AssessmentContext';
 
 export default function Results() {
@@ -27,11 +28,12 @@ export default function Results() {
       <div className="flex-1 flex flex-col relative h-full bg-[#f8f9fa] overflow-hidden">
         <Header />
         
-        <main className="flex-1 flex overflow-hidden p-6 gap-6 h-[calc(100vh-4rem)]">
-          <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex h-full">
+        <main className="flex-1 flex flex-col overflow-hidden p-6 gap-4 h-[calc(100vh-4rem)]">
+          <div className="flex-1 min-h-0 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex">
             <QuestionPanel />
             <AnswerViewer />
           </div>
+          <UnmatchedAnswers />
         </main>
       </div>
     </div>

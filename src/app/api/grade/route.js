@@ -3,6 +3,8 @@ import { model } from '@/lib/gemini';
 import { PROMPTS } from '@/lib/prompts';
 import { SchemaType } from '@google/generative-ai';
 
+export const maxDuration = 60;
+
 export async function POST(req) {
   try {
     const { questions, answers } = await req.json();

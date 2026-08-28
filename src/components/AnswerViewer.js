@@ -68,6 +68,11 @@ export default function AnswerViewer() {
         ref={containerRef}
         className="flex-1 overflow-auto bg-gray-900 p-8 flex justify-center relative"
       >
+        {selectedQuestionId && !activeAnswer && (
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm px-4 py-2 rounded-full shadow-lg z-50">
+            No answer found for this question
+          </div>
+        )}
         {nextPageWithAnswer !== null && (
           <button 
             onClick={() => setCurrentPage(nextPageWithAnswer)}
@@ -105,9 +110,9 @@ export default function AnswerViewer() {
               const qNum = questions.find(q => q.id === selectedQuestionId)?.number;
 
               return (
-                <div 
+                <div
                   key={idx}
-                  className="absolute border-2 border-green-500 bg-green-500/10 transition-all duration-300 pointer-events-none rounded -m-1 p-1"
+                  className="absolute border-2 border-green-500 bg-green-500/10 transition-all duration-300 pointer-events-none rounded"
                   style={{ top, left, height, width }}
                 >
                   {/* Question Number Tag */}

@@ -3,6 +3,8 @@ import { model } from '@/lib/gemini';
 import { PROMPTS } from '@/lib/prompts';
 import { SchemaType } from '@google/generative-ai';
 
+export const maxDuration = 60;
+
 export async function POST(req) {
   try {
     const { images, questions } = await req.json();
@@ -36,12 +38,14 @@ export async function POST(req) {
 
     // Process each page of the answer sheet
     for (let i = 0; i < images.length; i++) {
-      const base64Data = images[i].replace(/^data:image\/\w+;base64,/, '');
-      
+      const match = images[i].match(/^data:(image\/\w+);base64,(.+)$/);
+      const mimeType = match ? match[1] : 'image/jpeg';
+      const base64Data = match ? match[2] : images[i].replace(/^data:image\/\w+;base64,/, '');
+
       const imagePart = {
         inlineData: {
           data: base64Data,
-          mimeType: 'image/jpeg',
+          mimeType,
         },
       };
 
@@ -72,7 +76,13 @@ export async function POST(req) {
         const boundingBox = { yMin, xMin, yMax, xMax };
         const answerRegion = { pageIndex: i, boundingBox };
 
-        if (!region.questionId || region.questionId.trim() === '') {
+        // Only trust a questionId that actually exists in the known question list.
+        // The model doesn't reliably return an empty string for "no match" — it
+        // sometimes echoes back words like "unmatched" or "none" verbatim instead,
+        // which would otherwise slip through as a phantom match.
+        const matchedQ = questions.find(q => q.id === region.questionId);
+
+        if (!matchedQ) {
           unmatchedAnswers.push({
             extractedText: region.extractedText,
             regions: [answerRegion]
@@ -84,11 +94,9 @@ export async function POST(req) {
             existingAnswer.extractedText += '\n' + region.extractedText;
             existingAnswer.regions.push(answerRegion);
           } else {
-            // Find the original question number for reference
-            const matchedQ = questions.find(q => q.id === region.questionId);
             allAnswers.push({
               questionId: region.questionId,
-              questionNumber: matchedQ ? matchedQ.number : 'Unknown',
+              questionNumber: matchedQ.number,
               extractedText: region.extractedText,
               regions: [answerRegion],
               status: 'answered'
