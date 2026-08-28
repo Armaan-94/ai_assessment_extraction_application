@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VedaAI — Assessment Extraction & Answer Mapping
 
-## Getting Started
+Upload a question paper and a student's handwritten answer sheet. The app extracts every question, extracts every answer, matches them up, and highlights exactly where on the scan each answer lives — then grades the whole thing.
 
-First, run the development server:
+**Live app:** https://ai-assessment-extraction-applicatio.vercel.app
+**Repo:** https://github.com/Armaan-94/ai_assessment_extraction_application
+
+![App screenshot](docs/screenshot.png)
+
+## How it works
+
+```
+Question Paper ──┐
+                  ├─▶ Extract Questions ─▶ Extract Answers ─▶ Map Answers ─▶ Grade
+Answer Sheet   ───┘
+```
+
+1. **Upload** — a question paper and an answer sheet, PDF or image, client-side (no upload endpoint, files never leave the browser except as images sent to the model).
+2. **Extract Questions** — every question is pulled out in printed order, with labeled sub-parts (`11(a)`, `11(b)`) kept as separate entries and original numbering preserved.
+3. **Extract Answers** — the answer sheet is read page by page; each handwritten answer is matched to a question by its written label (not by position, so out-of-order answers still map correctly) and located with a bounding box.
+4. **Map & Highlight** — click any question and the exact region of the answer sheet lights up. Answers spanning multiple pages surface a "continues on page N" jump. Unanswered questions and answers that don't match any question are both called out explicitly rather than silently dropped.
+5. **Grade** — each answer is scored against its question with a short AI feedback note, and the panel adds up a running total.
+
+## Stack
+
+- **Next.js 14** (App Router) + React 18 + Tailwind CSS
+- **pdf.js** (`pdfjs-dist`) for client-side PDF → image rendering
+- **Gemini** (`gemini-flash-lite-latest`) for extraction, grounding, and grading, via the `@google/generative-ai` SDK, with structured JSON output enforced through response schemas
+- No database, no auth — everything lives in React state for the session, exactly as the brief asks for
+
+## Running locally
+
+```bash
+npm install
+```
+
+Create `.env.local`:
+
+```
+GEMINI_API_KEY=your_key_here
+```
+
+Get a free-tier key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Design notes & assumptions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Matching is id-based, not position-based.** Answer extraction is handed the full question list up front and matches each written answer to a question id, so answers out of order or answers referencing an earlier/later question both resolve correctly.
+- **"Unmatched" is validated, not trusted.** Rather than trusting the model to return an empty id for a stray answer, the id is checked against the actual known question list — this catches cases where the model echoes back words like "unmatched" instead of leaving the field empty.
+- **One question paper, one answer sheet, per session.** Multi-student batch grading is out of scope for this pass.
+- **Bounding-box grounding is inherently approximate.** It's driven by the vision model's own spatial understanding of the page image, so accuracy depends on handwriting legibility and layout density — cleaner handwriting and more whitespace between answers ground more reliably.
+- **Free-tier rate limits.** Grading is done sequentially with a short delay between calls to stay under the Gemini free-tier request rate; a large answer sheet will grade proportionally slower.
 
-## Learn More
+## Known limitations
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- No persistence — refreshing the results page loses the session (by design, per the "no database" constraint).
+- No batch/multi-student flow yet.
+- Very long answer sheets (many pages) will take proportionally longer end-to-end since pages are processed sequentially.
