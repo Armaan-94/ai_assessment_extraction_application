@@ -7,7 +7,7 @@ export default function QuestionPanel() {
   const { questions, grades, selectedQuestionId, updateState } = useAssessment();
 
   return (
-    <div className="w-[35%] bg-[#fafafa] border-r border-gray-200 h-full flex flex-col">
+    <div className="w-full lg:w-[35%] h-1/2 lg:h-full shrink-0 bg-[#fafafa] border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-white shrink-0">
         <h2 className="font-semibold text-gray-800 text-sm">Extracted Questions <span className="text-gray-400 font-normal">(from question paper)</span></h2>
         <button className="text-xs font-medium px-3 py-1 bg-white border border-gray-200 rounded-full hover:bg-gray-50">Expand All</button>

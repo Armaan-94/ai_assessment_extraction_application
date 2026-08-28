@@ -101,7 +101,7 @@ export default function Home() {
               <span className="text-4xl">👩‍🏫</span>
             </div>
 
-            <div className="w-full grid grid-cols-2 gap-6 relative -mt-24 pt-20">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 relative sm:-mt-24 pt-20">
               {/* Background pill shape connecting the two zones (aesthetic from figma) */}
               <div className="absolute top-1/2 left-0 right-0 h-48 bg-white/50 rounded-[40px] -z-10 blur-xl"></div>
               

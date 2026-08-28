@@ -10,7 +10,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col justify-between h-full shadow-sm z-10">
+    <aside className="hidden lg:flex w-64 shrink-0 bg-white border-r border-gray-200 flex-col justify-between h-full shadow-sm z-10">
       <div>
         <div 
           className="p-6 flex items-center gap-2 cursor-pointer" 

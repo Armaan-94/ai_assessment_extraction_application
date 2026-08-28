@@ -33,7 +33,7 @@ export default function AnswerViewer() {
   }
 
   return (
-    <div className="flex-1 bg-gray-900 rounded-tl-xl overflow-hidden flex flex-col relative h-full">
+    <div className="flex-1 min-h-0 bg-gray-900 lg:rounded-tl-xl overflow-hidden flex flex-col relative">
       {/* Toolbar */}
       <div className="h-14 bg-gray-800/80 backdrop-blur border-b border-gray-700 flex items-center justify-between px-6 z-10">
         <div className="text-white font-medium text-sm">Answer Sheet</div>
