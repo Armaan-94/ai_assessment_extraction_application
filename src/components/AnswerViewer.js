@@ -66,7 +66,7 @@ export default function AnswerViewer() {
       {/* Canvas Area */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-auto bg-gray-900 p-8 flex justify-center relative"
+        className="flex-1 overflow-auto bg-gray-900 p-8 flex justify-center items-start relative"
       >
         {selectedQuestionId && !activeAnswer && (
           <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm px-4 py-2 rounded-full shadow-lg z-50">
