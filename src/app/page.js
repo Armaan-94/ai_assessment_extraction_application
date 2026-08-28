@@ -11,7 +11,7 @@ import { fileToImages } from '@/lib/pdf-utils';
 
 export default function Home() {
   const router = useRouter();
-  const { status, updateState, resetAssessment } = useAssessment();
+  const { status, progressText, updateState, resetAssessment } = useAssessment();
   const [qPaper, setQPaper] = useState(null);
   const [aSheet, setASheet] = useState(null);
 
@@ -86,7 +86,7 @@ export default function Home() {
         <ProcessingOverlay 
           isVisible={status !== 'idle' && status !== 'error'} 
           status={status} 
-          text="Extracting... This may take a while" 
+          text={progressText} 
         />
 
         <main className="flex-1 overflow-auto p-8 flex flex-col items-center">
