@@ -8,6 +8,7 @@ export function AssessmentProvider({ children }) {
   const [state, setState] = useState({
     status: 'idle', // 'idle' | 'uploading' | 'extracting-questions' | 'extracting-answers' | 'grading' | 'complete' | 'error'
     error: null,
+    gradingError: null,
     progress: 0,
     progressText: '',
     questionPaperImages: [],
@@ -27,6 +28,7 @@ export function AssessmentProvider({ children }) {
     setState({
       status: 'idle',
       error: null,
+      gradingError: null,
       progress: 0,
       progressText: '',
       questionPaperImages: [],

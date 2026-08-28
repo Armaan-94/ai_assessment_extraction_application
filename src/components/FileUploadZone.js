@@ -1,16 +1,28 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
-export default function FileUploadZone({ 
-  title, 
-  subtitle = "Max 10MB", 
-  accept, 
-  onFileSelect, 
-  file, 
-  onRemove 
+const MAX_SIZE_BYTES = 10 * 1024 * 1024;
+
+export default function FileUploadZone({
+  title,
+  subtitle = "Max 10MB",
+  accept,
+  onFileSelect,
+  file,
+  onRemove
 }) {
   const inputRef = useRef(null);
+  const [sizeError, setSizeError] = useState(false);
+
+  const selectFile = (candidate) => {
+    if (candidate.size > MAX_SIZE_BYTES) {
+      setSizeError(true);
+      return;
+    }
+    setSizeError(false);
+    onFileSelect(candidate);
+  };
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -19,14 +31,16 @@ export default function FileUploadZone({
   const handleDrop = (e) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      onFileSelect(e.dataTransfer.files[0]);
+      selectFile(e.dataTransfer.files[0]);
     }
   };
 
   const handleChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      onFileSelect(e.target.files[0]);
+      selectFile(e.target.files[0]);
     }
+    // Allow re-selecting the same file after a size-rejected attempt
+    e.target.value = '';
   };
 
   return (
@@ -53,6 +67,11 @@ export default function FileUploadZone({
           </div>
           <p className="font-semibold text-gray-900 mb-1">Upload <span className="text-orange-500">{title}</span></p>
           <p className="text-xs text-gray-400">{subtitle}</p>
+          {sizeError && (
+            <p className="text-xs text-red-500 mt-2 text-center max-w-[200px]">
+              That file is over 10MB. Please upload a smaller file.
+            </p>
+          )}
         </>
       ) : (
         <div className="flex flex-col items-center relative w-full h-full justify-center">

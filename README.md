@@ -55,6 +55,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - **One question paper, one answer sheet, per session.** Multi-student batch grading is out of scope for this pass.
 - **Bounding-box grounding is inherently approximate.** It's driven by the vision model's own spatial understanding of the page image, so accuracy depends on handwriting legibility and layout density — cleaner handwriting and more whitespace between answers ground more reliably.
 - **Free-tier rate limits.** Grading is done sequentially with a short delay between calls to stay under the Gemini free-tier request rate; a large answer sheet will grade proportionally slower.
+- **Failures are recoverable, not fatal.** A failed extraction shows a dismissible in-app banner with a Retry button instead of a blocking alert, and keeps your uploaded files in place — no re-upload needed. If grading fails independently (e.g. a rate-limit blip) after mapping already succeeded, the results page still loads and offers a "Retry Grading" action on just that step.
 
 ## Known limitations
 
