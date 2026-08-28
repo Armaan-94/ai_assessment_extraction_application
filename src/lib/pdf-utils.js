@@ -25,7 +25,7 @@ async function pdfToImages(file) {
   // Point to the worker source in the public directory
   pdfJS.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
   
-  const loadingTask = pdfJS.getDocument(arrayBuffer);
+  const loadingTask = pdfJS.getDocument({ data: arrayBuffer });
   const pdf = await loadingTask.promise;
   const images = [];
   
