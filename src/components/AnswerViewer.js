@@ -107,7 +107,10 @@ export default function AnswerViewer() {
               const height = `${((yMax - yMin) / 1000) * 100}%`;
               const width = `${((xMax - xMin) / 1000) * 100}%`;
               
-              const qNum = questions.find(q => q.id === selectedQuestionId)?.number;
+              const rawNum = (questions.find(q => q.id === selectedQuestionId)?.number || '').trim();
+              // The extracted `number` is whatever was printed on the paper (e.g. "Q2", "2", "11(a)") -
+              // prefix with "Q" only when it isn't already labeled, to avoid a "QQ2" double-prefix.
+              const qLabel = /^q/i.test(rawNum) ? rawNum : `Q${rawNum}`;
 
               return (
                 <div
@@ -117,7 +120,7 @@ export default function AnswerViewer() {
                 >
                   {/* Question Number Tag */}
                   <div className="absolute -top-3 -left-3 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-md z-10">
-                    Q{qNum}
+                    {qLabel}
                   </div>
                 </div>
               );
